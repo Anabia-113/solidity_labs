@@ -1,6 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+// //1) Compile-time errors are checked during the compilation process when Solidity code is
+// converted into bytecode.
+// 2) Runtime errors occur while executing contracts and can be challenging to identify.
+// Common runtime errors include out-of-gas errors, data type overflow errors, divide by
+// zero errors, and array out-of-index errors.
+
+// Revert:
+// The revert statement is used to revert the current transaction or execution with an optional error message.
+// It consumes the least gas compared to require and assert since it doesn't perform additional checks or validations beyond stopping execution.
+// It's commonly used for controlled error handling and to provide informative error messages to users.
+
+// Require:
+// The require statement is used to validate conditions and revert the transaction if the condition is not met.
+// It consumes more gas compared to revert due to the additional condition checking and evaluation.
+// It's often used for input validation and preconditions to ensure that a function is only executed under certain circumstances.
+
+// Assert:
+// The assert statement is used to ensure internal consistency and check for conditions that should never occur under normal circumstances.
+// It's used for debugging and should not be relied upon for regular error handling.
+// It consumes the most gas among the three because it's assumed that if an assert condition fails, there's a serious bug in the code.
+
 // contract InputValidator {
 //      mapping(address => uint256) public balances;
 //     constructor() {
@@ -139,7 +160,6 @@ pragma solidity ^0.8.9;
 // }
 // }
 
-
 //task 9
 // contract DriverLicence{
 //     uint RequiredAge = 18;
@@ -158,16 +178,18 @@ pragma solidity ^0.8.9;
 // }
 
 //task 10
-contract ATM{
-    uint CashAvailable;
-    error InsufficientFunds(string message, uint CashAvailable);
-     function MoneyWithdraw(uint256 WithdrawAmount) public {
+contract ATM {
+    uint256 CashAvailable;
+    error InsufficientFunds(string message, uint256 CashAvailable);
+
+    function MoneyWithdraw(uint256 WithdrawAmount) public {
         if (CashAvailable < WithdrawAmount) {
-            revert InsufficientFunds( "Insufficient funds" ,CashAvailable);
+            revert InsufficientFunds("Insufficient funds", CashAvailable);
         }
         // deduct the ‘WithdrawAmount’ from the ‘CashAvailable’
         CashAvailable -= WithdrawAmount;
     }
+
     function ATMRefill(uint256 RefillAmount) public {
         //Add the ‘RefillAmount’ to the current ‘CashAvailable’ balance
         CashAvailable += RefillAmount;
