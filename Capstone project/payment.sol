@@ -39,10 +39,11 @@ contract PaymentSystem {
         employeeSigned = true;
     }
 
-    function transfer() public onlyEscrow {
+    function transfer() public payable  {
         require(employerSigned && employeeSigned, "Both parties must sign before transferring funds");
-        
-        // Transfer funds to the employee's wallet
+
+        // Transfer funds to the  wallet
         payable(employee).transfer(amount);
     }
 }
+
