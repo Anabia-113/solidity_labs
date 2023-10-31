@@ -42,7 +42,7 @@ contract PaymentSystem {
     function transfer() public payable  {
         require(employerSigned && employeeSigned, "Both parties must sign before transferring funds");
 
-        // Transfer funds to the  wallet
+        // Transfer funds to the  employee's wallet
         payable(employee).transfer(amount);
     }
 }
