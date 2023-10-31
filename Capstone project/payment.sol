@@ -58,10 +58,9 @@ contract PaymentSystem {
     bool public disputeRaised;
     address public disputeParty;
 
-    constructor(address _employee, address _escrow, uint _amount) {
+    constructor(address _employee , uint _amount) {
         employer = msg.sender;
         employee = _employee;
-        escrow = _escrow;
         paymentAmount = _amount;
     }
 
@@ -72,11 +71,6 @@ contract PaymentSystem {
 
     modifier onlyEmployee() {
         require(msg.sender == employee, "Only the employee can perform this action.");
-        _;
-    }
-
-    modifier onlyEscrow() {
-        require(msg.sender == escrow, "Only the escrow can perform this action.");
         _;
     }
 
@@ -102,7 +96,7 @@ contract PaymentSystem {
         disputeParty = msg.sender;
     }
 
-    function resolveDispute(bool resolve) public onlyEscrow {
+    function resolveDispute(bool resolve) public {
         require(disputeRaised, "No dispute to resolve.");
 
         if (resolve) {
