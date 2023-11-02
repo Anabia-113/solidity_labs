@@ -50,15 +50,19 @@ pragma solidity ^0.8.0;
 contract PaymentSystem {
     address public employer;
     address public employee;
-    address public escrow;
     uint public paymentAmount;
     bool public employerSigned;
     bool public employeeSigned;
     bool public workCompleted;
     bool public disputeRaised;
     address public disputeParty;
+    address private owner;
+    constructor()payable {
+        owner=msg.sender;
+    }
 
-    constructor(address _employee , uint _amount) {
+    function initializePayment(address _employee, uint _amount) public {
+        require(employer == address(0), "Payment details are already initialized.");
         employer = msg.sender;
         employee = _employee;
         paymentAmount = _amount;
@@ -74,15 +78,15 @@ contract PaymentSystem {
         _;
     }
 
-    function employerSigns() public onlyEmployer {
-        require(!employerSigned, "Employer has already signed.");
-        employerSigned = true;
-    }
+    // function employerSigns() public onlyEmployer {
+    //     require(!employerSigned, "Employer has already signed.");
+    //     employerSigned = true;
+    // }
 
-    function employeeSigns() public onlyEmployee {
-        require(!employeeSigned, "Employee has already signed.");
-        employeeSigned = true;
-    }
+    // function employeeSigns() public onlyEmployee {
+    //     require(!employeeSigned, "Employee has already signed.");
+    //     employeeSigned = true;
+    // }
 
     function completeWork() public onlyEmployee {
         require(!workCompleted, "Work is already completed.");
@@ -95,21 +99,33 @@ contract PaymentSystem {
         disputeRaised = true;
         disputeParty = msg.sender;
     }
-
+    function IamEmployer()public{
+        employer=msg.sender;
+    }
+    function Employ()public{
+      employee=msg.sender;
+    }
     function resolveDispute(bool resolve) public {
         require(disputeRaised, "No dispute to resolve.");
 
         if (resolve) {
             // Dispute resolved in favor of the party who didn't raise the dispute.
+            address payable receiver;
             if (disputeParty == employer) {
-                payable(0xc49b369cfD9D7Fcf7C643055bF4189BE010A1120).transfer(paymentAmount);
+                receiver = payable(employee);
             } else {
-                payable(0x2A2fff2F220A616F15876fbb82C06f87C5c5a76f).transfer(paymentAmount);
+                receiver = payable(employer);
             }
+            
+            uint deduction = paymentAmount / 10; // 10% deduction
+            uint finalPayment = paymentAmount - deduction;
+            
+            receiver.transfer(finalPayment);
         }
 
         disputeRaised = false;
     }
+}
 //     event Err(uint);
 //     function deposit()public payable{
 //         if(msg.value<1000){
@@ -123,4 +139,3 @@ contract PaymentSystem {
 //         payable(0xc49b369cfD9D7Fcf7C643055bF4189BE010A1120).transfer(address(this).balance);
 //     }
 // }
-}
