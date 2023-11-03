@@ -78,19 +78,19 @@ contract PaymentSystem {
         _;
     }
 
-    // function employerSigns() public onlyEmployer {
-    //     require(!employerSigned, "Employer has already signed.");
-    //     employerSigned = true;
-    // }
+    function employerSigns() public onlyEmployer {
+        require(!employerSigned, "Employer has already signed.");
+        employerSigned = true;
+    }
 
-    // function employeeSigns() public onlyEmployee {
-    //     require(!employeeSigned, "Employee has already signed.");
-    //     employeeSigned = true;
-    // }
+    function employeeSigns() public onlyEmployee {
+        require(!employeeSigned, "Employee has already signed.");
+        employeeSigned = true;
+    }
 
     function completeWork() public onlyEmployee {
         require(!workCompleted, "Work is already completed.");
-        workCompleted = true;
+        workCompleted = employerSigned&&employeeSigned;
     }
 
     function raiseDispute() public {
