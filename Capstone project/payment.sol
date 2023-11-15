@@ -93,7 +93,6 @@ contract PaymentSystem {
             
             receiver.transfer(finalPayment);
         }
-
         disputeRaised = false;
     }
 }
