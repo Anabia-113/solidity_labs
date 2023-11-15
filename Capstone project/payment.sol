@@ -14,7 +14,7 @@ contract PaymentSystem {
     constructor()payable {
         owner=msg.sender;
     }
-     
+     mapping(address=>string) public reviews;
     function initializePayment(address _employee, uint _amount) public {
         require(employer != address(0), "Payment details are already initialized.");
         employer = msg.sender;
@@ -31,20 +31,26 @@ contract PaymentSystem {
         require(msg.sender == employee, "Only the employee can perform this action.");
         _;
     }
-
+     function giveReview(string memory review)public onlyEmployer{
+        reviews[employee]=review;
+     }
     function employerSigns() public onlyEmployer {
         require(employerSigned, "Employer has already signed.");
         employerSigned = true;
     }
 
     function employeeSigns() public onlyEmployee {
-        require(employeeSigned, "Employee has already signed.");
+        require(employeeSigned==true, "Employee has already signed.");
         employeeSigned = true;
+    }
+    function getReview()public view returns(string memory){
+        return reviews[employee];
     }
 
     function completeWork() public onlyEmployee {
         require(!workCompleted, "Work is already completed.");
         workCompleted = employerSigned&&employeeSigned;
+        reviews[msg.sender]="";
     }
 
     function raiseDispute() public {
