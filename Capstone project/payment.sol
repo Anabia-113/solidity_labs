@@ -5,12 +5,13 @@ contract PaymentSystem {
     address public employer;
     address public employee;
     uint public paymentAmount;
-    bool public employerSigned;
-    bool public employeeSigned;
+    bool public employerSigned=false;
+    bool public employeeSigned=false;
     bool public workCompleted;
     bool public disputeRaised;
     address public disputeParty;
     address private owner;
+    bool public paid;
 
     //// Constructor that sets the contract deployer as the owner
     constructor()payable {
@@ -39,7 +40,6 @@ contract PaymentSystem {
     }
     // Function to initialize payment details (can only be called once)
      function initializePayment(address _employee, uint _amount) public {
-        require(employer != address(0), "Payment details are already initialized.");
         employer = msg.sender;
         employee = _employee;
         paymentAmount = _amount;
@@ -50,12 +50,10 @@ contract PaymentSystem {
      }
      // Function for the employer to sign the payment (can only be called once)
     function employerSigns() public onlyEmployer {
-        require(employerSigned, "Employer has already signed.");
         employerSigned = true;
     }
     // Function for the employee to sign the payment (can only be called once)
     function employeeSigns() public onlyEmployee {
-        require(employeeSigned==true, "Employee has already signed.");
         employeeSigned = true;
     }
     // Function to get the review given by the employer for the employee
@@ -63,62 +61,19 @@ contract PaymentSystem {
         return reviews[employee];
     }
     // Function for the employee to mark the work as completed
-    function completeWork() public onlyEmployee {
-        require(!workCompleted, "Work is already completed.");
-        workCompleted = employerSigned&&employeeSigned;
+    function completeWork() public payable onlyEmployee {
+        require(employerSigned&&employeeSigned,"Either Employ or Employed haven't signed yet");
         reviews[msg.sender]="";
+        employeeSigned=false;
+        employerSigned=false;
+        payable(employee).transfer(address(this).balance);
     }
-    // Function for either party to raise a dispute
-    function raiseDispute() public {
-        require(msg.sender == employer || msg.sender == employee, "Only the employer or employee can raise a dispute.");
-        require(!disputeRaised, "A dispute is already raised.");
-        disputeRaised = true;
-        disputeParty = msg.sender;
-    }
-    // Function to resolve the dispute, transferring funds accordingly
-    // function resolveDispute(bool resolve) public {
-    //     require(disputeRaised, "No dispute to resolve.");
+    //pay to the contract address
+    function pay()public payable onlyEmployer{
+          require(msg.value>paymentAmount,"Low Amount Entered");
+          paid=true;
 
-    //     if (resolve) {
-    //         // Dispute resolved in favor of the party who didn't raise the dispute.
-    //         address payable receiver;
-    //         if (disputeParty == employer) {
-    //             receiver = payable(employee);
-    //         } else {
-    //             receiver = payable(employer);
-    //         }
-            
-    //         uint deduction = paymentAmount / 10; // 10% deduction
-    //         uint finalPayment = paymentAmount - deduction;
-            
-    //         receiver.transfer(finalPayment);
-    //     }
-    //     disputeRaised = false;
-    // }
-
-    function resolveDispute(bool resolve) public {
-    require(disputeRaised, "No dispute to resolve.");
-
-    // Transfer the funds to the contract address
-    require(address(this).balance >= paymentAmount, "Insufficient funds in the contract.");
-
-    if (resolve) {
-        // Dispute resolved in favor of the party who didn't raise the dispute.
-        address payable receiver;
-        if (disputeParty == employer) {
-            receiver = payable(employee);
-        } else {
-            receiver = payable(employer);
-        }
-
-        // Transfer the funds to the receiver
-        receiver.transfer(paymentAmount);
-    } else {
-        // Dispute not resolved, refund the funds to the employer
-        payable(employer).transfer(paymentAmount);
     }
 
-    disputeRaised = false;
+
 }
-}
-
