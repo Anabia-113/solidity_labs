@@ -76,24 +76,49 @@ contract PaymentSystem {
         disputeParty = msg.sender;
     }
     // Function to resolve the dispute, transferring funds accordingly
-    function resolveDispute(bool resolve) public {
-        require(disputeRaised, "No dispute to resolve.");
+    // function resolveDispute(bool resolve) public {
+    //     require(disputeRaised, "No dispute to resolve.");
 
-        if (resolve) {
-            // Dispute resolved in favor of the party who didn't raise the dispute.
-            address payable receiver;
-            if (disputeParty == employer) {
-                receiver = payable(employee);
-            } else {
-                receiver = payable(employer);
-            }
+    //     if (resolve) {
+    //         // Dispute resolved in favor of the party who didn't raise the dispute.
+    //         address payable receiver;
+    //         if (disputeParty == employer) {
+    //             receiver = payable(employee);
+    //         } else {
+    //             receiver = payable(employer);
+    //         }
             
-            uint deduction = paymentAmount / 10; // 10% deduction
-            uint finalPayment = paymentAmount - deduction;
+    //         uint deduction = paymentAmount / 10; // 10% deduction
+    //         uint finalPayment = paymentAmount - deduction;
             
-            receiver.transfer(finalPayment);
+    //         receiver.transfer(finalPayment);
+    //     }
+    //     disputeRaised = false;
+    // }
+
+    function resolveDispute(bool resolve) public {
+    require(disputeRaised, "No dispute to resolve.");
+
+    // Transfer the funds to the contract address
+    require(address(this).balance >= paymentAmount, "Insufficient funds in the contract.");
+
+    if (resolve) {
+        // Dispute resolved in favor of the party who didn't raise the dispute.
+        address payable receiver;
+        if (disputeParty == employer) {
+            receiver = payable(employee);
+        } else {
+            receiver = payable(employer);
         }
-        disputeRaised = false;
+
+        // Transfer the funds to the receiver
+        receiver.transfer(paymentAmount);
+    } else {
+        // Dispute not resolved, refund the funds to the employer
+        payable(employer).transfer(paymentAmount);
     }
+
+    disputeRaised = false;
+}
 }
 
