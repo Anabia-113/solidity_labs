@@ -60,7 +60,7 @@ contract PaymentSystem {
     function getReview()public view returns(string memory){
         return reviews[employee];
     }
-    // Function for the employee to mark the work as completed
+    // Function for the employee to mark the work as completed and transfer funds from the escrow to the employee
     function completeWork() public payable onlyEmployee {
         require(employerSigned&&employeeSigned,"Either Employ or Employed haven't signed yet");
         reviews[msg.sender]="";
